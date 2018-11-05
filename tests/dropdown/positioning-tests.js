@@ -175,3 +175,43 @@ test('dropdown is positioned down with absolute offsets', function (assert) {
         'There should not be an extra left offset'
     );
 });
+
+test('dropdown is repositioned when message is shown', function (assert) {
+
+    var $ = require('jquery');
+    var $select = $('<select></select>');
+    var $parent = $('<div></div>');
+
+    var $container = $('<span></span>');
+    var container = new MockContainer();
+
+    // $('#qunit-fixture').empty();
+
+    $parent.appendTo($('#qunit-fixture'));
+    $select.appendTo($parent);
+
+    var Utils = require('select2/utils');
+    var Options = require('select2/options');
+
+    var Dropdown = require('select2/dropdown');
+    var AttachBody = require('select2/dropdown/attachBody');
+
+    var DropdownAdapter = Utils.Decorate(Dropdown, AttachBody);
+
+    var dropdown = new DropdownAdapter($select, new Options({
+        dropdownParent: $parent
+    }));
+
+    var $dropdown = dropdown.render();
+
+    dropdown.bind(container, $container);
+    dropdown.position($dropdown, $container);
+
+    dropdown._showDropdown();
+
+    assert.equal(
+        $dropdown.css('top'),
+        $select[0].getBoundingClientRect().top + dropdown.$dropdown.height(),
+        'The dropdown should be positioned so that it is attached to the search box'
+    );
+});
